@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Happy Birthday Shreya</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&family=Dancing+Script&display=swap" rel="stylesheet">
+
+<style>
+:root{--gold:#C9A227; --glass: rgba(30, 30, 30, 0.9);}
+
+body{margin:0; background:#000; color:white; font-family:'Playfair Display', serif; overflow:hidden; touch-action: manipulation;}
+#stars{position:fixed; top:0; left:0; z-index:-1;}
+
+/* 📜 GLASSY BOX */
+.box{
+    position:relative; width:90%; max-width:600px; padding:25px;
+    background: var(--glass); color: var(--gold); 
+    font-family: 'Dancing Script', cursive; line-height: 32px;
+    border-radius: 15px; border: 1px solid rgba(201, 162, 39, 0.3);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.8); text-align: left; z-index: 10;
+}
+
+.page{ display:none; min-height:100vh; justify-content:center; align-items:center; flex-direction:column; text-align: center; padding: 20px; box-sizing: border-box;}
+.active{display:flex;}
+h1{color:var(--gold); text-shadow: 2px 2px 10px rgba(0,0,0,0.5); font-size: 1.8rem; margin-top: 0;}
+
+button{
+    background:var(--gold); border:none; padding:12px 25px; border-radius:30px;
+    cursor:pointer; margin-top:20px; color: black; font-weight: bold; 
+    font-family: sans-serif; transition: 0.3s; z-index: 20;
+}
+
+/* 🎏 RAINBOW PARTY FLAG DECORATIONS */
+.flags-container {
+    position: fixed; top: -100px; left: 0; width: 100%; height: 120px;
+    display: flex; justify-content: space-around;
+    z-index: 5; transition: top 1s ease-out;
+}
+.flag-string {
+    position: absolute; top: 10px; left: 0; width: 100%; height: 2px;
+    background: var(--gold); box-shadow: 0 2px 10px rgba(201,162,39,0.5);
+}
+.flag {
+    width: 0; height: 0;
+    border-left: 25px solid transparent;
+    border-right: 25px solid transparent;
+    border-top: 60px solid;
+    position: relative; top: -5px;
+    filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5));
+}
+/* Flag Colour Patterns based on image_0.png */
+.flag:nth-child(even) { border-top-color: #A08120; /* Gold */ }
+.flag:nth-child(odd) { border-top-color: #ff4d4d; /* Red/Pink */ }
+.flag:nth-child(3n+1) { border-top-color: #4d79ff; /* Blue */ }
+.flag:nth-child(4n+1) { border-top-color: #2D9B38; /* Green */ }
+
+.gif{ position:absolute; top:20px; left:50%; transform:translateX(-50%); width:120px; border-radius: 10px; z-index: 15;}
+
+/* 🎂 REALISTIC MULTI-LAYER CHOCOLATE CAKE */
+.cake{position:relative; width:200px; height:130px; margin-bottom: 20px; z-index: 10; margin: 30px auto;}
+/* Multilayer cake body */
+.cake-layers {
+    position: absolute; bottom: 0; width: 200px; height: 100px;
+    background: repeating-linear-gradient(#3b1f0f, #3b1f0f 20px, #2a1409 20px, #2a1409 40px);
+    border-radius: 10px; border-bottom: 5px solid rgba(0,0,0,0.5);
+}
+.icing{position:absolute; top:0; width:200px; height:35px; background:#fff; border-radius:50%; border-bottom: 2px solid rgba(0,0,0,0.3);}
+.candle{position:absolute; top:-60px; left:92px; width:15px; height:60px; background:var(--gold); display:none;}
+.flame{
+    width:12px; height:22px; background:radial-gradient(circle,#ffd700,orange);
+    border-radius:50%; position:absolute; top:-25px; left:1px;
+    display:none; animation:flicker 0.15s infinite;
+}
+@keyframes flicker{ 0%, 100%{transform:scale(1.1);} 50%{transform:scale(1.4);} }
+
+/* 🎈 BALLOONS */
+.row{display:flex; gap:15px; margin-top: 25px; z-index: 10;}
+.balloon{
+    width:70px; height:90px; border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:white; font-weight:bold;
+}
+.popped{ background:transparent !important; border:none !important; color: var(--gold) !important; font-size: 1.4rem;}
+
+/* 📸 PHOTO SLIDER & FIREWORKS BUTTON FIX */
+.slider-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; margin-bottom: 20px;}
+.slider{width:280px; height:380px; border: 4px solid var(--gold); border-radius: 15px; overflow: hidden; margin: 15px 0;}
+.slide{width:100%; height:100%; display:none; object-fit:cover;}
+.active-img{display:block;}
+.slider-nav {display: flex; gap: 10px; z-index: 20;}
+
+#fwCanvas{position:fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" src="bg.mp3" loop></audio>
+<audio id="fireMusic" src="fire.mp3"></audio>
+<canvas id="stars"></canvas>
+
+<div id="flagsDecor" class="flags-container">
+    <div class="flag-string"></div>
+    <div class="flag"></div> <div class="flag"></div> <div class="flag"></div> <div class="flag"></div>
+    <div class="flag"></div> <div class="flag"></div> <div class="flag"></div> <div class="flag"></div>
+</div>
+
+<div class="page active" id="p1">
+    <img src="girl.gif" class="gif">
+    <div class="box">
+        <h1 id="title" style="margin:0;"></h1>
+        <p id="subtitle" style="margin-top:10px;"></p>
+    </div>
+    <button id="startBtn" style="display:none;" onclick="startSurprise()">Start the surprise</button>
+</div>
+
+<div class="page" id="p2">
+    <div class="cake">
+        <div class="cake-layers"></div>
+        <div class="icing"></div>
+        <div class="candle" id="candle"><div class="flame" id="flame"></div></div>
+    </div>
+    <h1 id="hbd" style="display:none;">Happy Birthday Shreya!!</h1>
+    <button id="decorateBtn" style="display:block;" onclick="decorate()">Decorate</button>
+    <button id="lightBtn" style="display:none;" onclick="light()">Light the candle</button>
+    <button id="nextBtn" style="display:none;" onclick="next(3)">Pop the Balloon</button>
+</div>
+
+<div class="page" id="p3">
+    <div class="box" style="text-align:center;"><h1>Pop them!</h1></div>
+    <div class="row">
+        <div class="balloon" style="background:#ff4d4d" onclick="pop(this,'You')"></div>
+        <div class="balloon" style="background:#4d79ff" onclick="pop(this,'Are')"></div>
+        <div class="balloon" style="background:#ff85a2" onclick="pop(this,'Truly')"></div>
+        <div class="balloon" style="background:#a64dff" onclick="pop(this,'Special')"></div>
+    </div>
+    <button id="nextB" style="display:none;" onclick="next(4)">Next</button>
+</div>
+
+<div class="page" id="p4">
+    <div class="slider-wrapper">
+        <div class="box" style="text-align:center;"><h1>CUTIEE &lt;3</h1></div>
+        <div class="slider">
+            <img src="photo1.jpg" class="slide active-img">
+            <img src="photo2.jpg" class="slide">
+            <img src="photo3.jpg" class="slide">
+        </div>
+        <div class="slider-nav">
+            <button style="margin-top:0;" onclick="prev()">←</button>
+            <button style="margin-top:0;" onclick="nextSlide()">→</button>
+        </div>
+    </div>
+    <button id="openMsgBtn" style="margin-top:0;" onclick="next(5)">Open my message</button>
+</div>
+
+<div class="page" id="p5">
+    <div class="box" id="letter"></div>
+    <button id="next5" onclick="next(6)">Next</button>
+</div>
+
+<div class="page" id="p6">
+    <div class="box" style="text-align:center;"><p>Continue to see fireworks</p></div>
+    <button style="display:block" onclick="fireworks()">Show Fireworks</button>
+</div>
+
+<div class="page" id="p7">
+    <canvas id="fwCanvas"></canvas>
+    <div class="box" style="z-index: 100; text-align:center;">
+        <p>✨ Please wait till the end ✨</p>
+        <button id="finalBtn" style="display:none;" onclick="showFinal()">My Last Message</button>
+    </div>
+</div>
+
+<div class="page" id="p8">
+    <div class="box" id="endMsg"></div>
+</div>
+
+<script>
+const bgMusic = document.getElementById("bgMusic");
+const fireMusic = document.getElementById("fireMusic");
+
+/* 🌌 STARS */
+const s=document.getElementById("stars");
+const ctx=s.getContext("2d");
+s.width=innerWidth; s.height=innerHeight;
+let stars=[];
+for(let i=0;i<120;i++){ stars.push({x:Math.random()*s.width,y:Math.random()*s.height,r:Math.random()*1.5}); }
+function anim(){
+    ctx.clearRect(0,0,s.width,s.height);
+    stars.forEach(st=>{ st.y+=0.2; if(st.y>s.height) st.y=0; ctx.beginPath(); ctx.arc(st.x,st.y,st.r,0,6.28); ctx.fillStyle="white"; ctx.fill(); });
+    requestAnimationFrame(anim);
+}
+anim();
+
+/* TYPEWRITER */
+function type(elId, text, cb) {
+    const el = document.getElementById(elId);
+    let i = 0; el.innerHTML = "";
+    function t() {
+        if (i < text.length) { el.innerHTML += text[i++]; setTimeout(t, 35); }
+        else if (cb) cb();
+    }
+    t();
+}
+
+window.onload = () => {
+    type("title", "A girl was born 17 years ago!", () => {
+        type("subtitle", "Yes, it's YOU! A small birthday gift from me", () => {
+            document.getElementById("startBtn").style.display = "block";
+        });
+    });
+};
+
+function startSurprise() {
+    bgMusic.play().catch(e => console.log("Blocked"));
+    next(2);
+}
+
+function next(n){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('p'+n).classList.add('active');
+    if(n==5){
+        type("letter", "Happy Birthday Shreya! You deserve all the happiness, love and smiles in the world today and always. You have this special way of making everything brighter around you. Anyways I couldn't celebrate your birthday like last time and I didn't want to.. But yeah I couldn't resist myself wishing you. I hope your days are filled with laughter, surprises, and moments that make you smile and happy.", () => {
+            document.getElementById("next5").style.display = "block";
+        });
+    }
+}
+
+/* 🎏 DECORATE WITH RAINBOW FLAGS */
+function decorate(){
+    document.getElementById("flagsDecor").style.top = "0";
+    
+    setTimeout(() => {
+        document.getElementById("candle").style.display="block";
+        document.getElementById("decorateBtn").style.display="none";
+        document.getElementById("lightBtn").style.display="inline-block";
+    }, 1000);
+}
+
+function light(){
+    document.getElementById("flame").style.display="block";
+    document.getElementById("hbd").style.display="block";
+    document.getElementById("lightBtn").style.display="none";
+    document.getElementById("nextBtn").style.display="inline-block";
+}
+
+let count=0;
+function pop(el,text){
+    if(!el.classList.contains('popped')){
+        el.classList.add('popped'); el.innerHTML = text; count++;
+        if(count==4) document.getElementById("nextB").style.display="block";
+    }
+}
+
+let slideIdx=0;
+function nextSlide(){
+    let slides=document.querySelectorAll('.slide');
+    if(slides.length === 0) return;
+    slides[slideIdx].classList.remove('active-img');
+    slideIdx=(slideIdx+1)%slides.length;
+    slides[slideIdx].classList.add('active-img');
+}
+function prev(){
+    let slides=document.querySelectorAll('.slide');
+    if(slides.length === 0) return;
+    slides[slideIdx].classList.remove('active-img');
+    slideIdx=(slideIdx-1+slides.length)%slides.length;
+    slides[slideIdx].classList.add('active-img');
+}
+
+function fireworks(){
+    next(7);
+    bgMusic.pause();
+    fireMusic.play();
+    const canvas=document.getElementById("fwCanvas");
+    const c=canvas.getContext("2d");
+    canvas.width=innerWidth; canvas.height=innerHeight;
+    let particles=[];
+
+    let fwInterval = setInterval(()=>{
+        let x=Math.random()*canvas.width;
+        let y=Math.random()*canvas.height/2;
+        for(let i=0;i<80;i++){
+            particles.push({x,y, a:Math.random()*6.28, s:Math.random()*5+2, color:`hsl(${Math.random()*360},100%,50%)`});
+        }
+    },800);
+
+    function draw(){
+        c.fillStyle="rgba(0,0,0,0.2)";
+        c.fillRect(0,0,canvas.width,canvas.height);
+        particles.forEach((p, index)=>{
+            p.x+=Math.cos(p.a)*p.s; p.y+=Math.sin(p.a)*p.s;
+            c.beginPath(); c.arc(p.x,p.y,2,0,6.28); c.fillStyle=p.color; c.fill();
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+    setTimeout(()=>{
+        clearInterval(fwInterval);
+        document.getElementById("finalBtn").style.display="block";
+    }, 25000);
+}
+
+function showFinal(){
+    next(8);
+    type("endMsg", "Sorry I couldn't do fireworks in reality but I could do that digitally. I hope this small surprise gave you a smile and it's a three days brain storming work, I hope you liked it.\n\n~From Yatin");
+}
+</script>
+</body>
+</html>
