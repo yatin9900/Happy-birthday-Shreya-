@@ -12,6 +12,17 @@
 body{margin:0; background:#000; color:white; font-family:'Playfair Display', serif; overflow:hidden; touch-action: manipulation;}
 #stars{position:fixed; top:0; left:0; z-index:-1;}
 
+/* 🔊 VOLUME ALERT OVERLAY */
+#volumeOverlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; display: flex; justify-content: center; align-items: center;
+    z-index: 1000; transition: 0.5s;
+}
+.volume-box {
+    text-align: center; border: 1px solid var(--gold); padding: 30px;
+    border-radius: 20px; background: rgba(20, 20, 20, 0.9); width: 80%; max-width: 400px;
+}
+
 .box{
     position:relative; width:90%; max-width:600px; padding:25px;
     background: var(--glass); color: var(--gold); 
@@ -43,7 +54,6 @@ button{
     width: 0; height: 0;
     border-left: 25px solid transparent; border-right: 25px solid transparent;
     border-top: 60px solid; position: relative; top: -5px;
-    filter: drop-shadow(0 4px 5px rgba(0,0,0,0.5));
 }
 .flag:nth-child(even) { border-top-color: #ff4d4d; }
 .flag:nth-child(odd) { border-top-color: #4d79ff; }
@@ -100,32 +110,41 @@ button{
     100% { transform: scale(1); opacity: 1; }
 }
 
-.slider-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;}
-.slider{width:280px; height:380px; border: 4px solid var(--gold); border-radius: 15px; overflow: hidden; margin: 15px 0;}
-.slide{width:100%; height:100%; display:none; object-fit:cover;}
-.active-img{display:block;}
+/* 🎥 VIDEO CONTAINER STYLES */
+.video-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10;}
+.video-container {
+    width: 280px; height: 380px; border: 4px solid var(--gold); 
+    border-radius: 15px; overflow: hidden; margin: 15px 0;
+    background: #000; box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+}
+.video-container video { width: 100%; height: 100%; object-fit: cover; }
 
 #fwCanvas{position:fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;}
 
-/* 🎆 UPDATED FIREWORKS WAIT BOX (Smaller & Cornered) */
 #p7 .box {
     position: fixed; bottom: 20px; right: 20px; 
     width: auto; max-width: 200px; padding: 10px 15px;
-    background: rgba(30, 30, 30, 0.7); /* More translucent */
+    background: rgba(30, 30, 30, 0.7);
     font-size: 0.9rem; line-height: 20px;
     border-radius: 10px; text-align: center;
     box-shadow: 0 5px 15px rgba(0,0,0,0.5);
     z-index: 20;
 }
-#p7 .box p { margin: 0 0 10px 0; }
-#p7 button { margin-top: 5px; padding: 8px 15px; font-size: 0.8rem; }
-
 </style>
 </head>
 
 <body>
 
-<audio id="bgMusic" src="bg.mp3" loop></audio>
+<div id="volumeOverlay">
+    <div class="volume-box">
+        <span style="font-size:40px;">🔊</span>
+        <h3>Please Turn Up The Volume</h3>
+        <p>To enhance your experience, please make sure your volume is up!</p>
+        <button onclick="startEverything()">Okay, Continue!</button>
+    </div>
+</div>
+
+<audio id="bgMusic" src="music1.mp3" loop></audio>
 <audio id="fireMusic" src="fire.mp3"></audio>
 <canvas id="stars"></canvas>
 
@@ -138,7 +157,7 @@ button{
 <div class="page active" id="p1">
     <img src="girl.gif" class="gif">
     <div class="box"><h1 id="title"></h1><p id="subtitle"></p></div>
-    <button id="startBtn" style="display:none;" onclick="startSurprise()">Start the surprise</button>
+    <button id="next1" style="display:none;" onclick="next(2)">Go Ahead</button>
 </div>
 
 <div class="page" id="p2">
@@ -165,16 +184,10 @@ button{
 </div>
 
 <div class="page" id="p4">
-    <div class="slider-wrapper">
-        <div class="box"><h1>CUTIEE &lt;3</h1></div>
-        <div class="slider">
-            <img src="photo1.jpg" class="slide active-img">
-            <img src="photo2.jpg" class="slide">
-            <img src="photo3.jpg" class="slide">
-        </div>
-        <div>
-            <button onclick="prev()">←</button>
-            <button onclick="nextSlide()">→</button>
+    <div class="video-wrapper">
+        <div class="box"><h1>Happy Birthday Cutie &lt;3</h1></div>
+        <div class="video-container">
+            <video id="shreyaVideo" src="edit.mp4" controls playsinline></video>
         </div>
     </div>
     <button onclick="next(5)">Open my message</button>
@@ -188,6 +201,17 @@ button{
 <script>
 const bgMusic = document.getElementById("bgMusic");
 const fireMusic = document.getElementById("fireMusic");
+const shreyaVideo = document.getElementById("shreyaVideo");
+
+/* 🔊 START EVERYTHING AFTER NOTICE */
+function startEverything() {
+    document.getElementById("volumeOverlay").style.opacity = "0";
+    setTimeout(() => {
+        document.getElementById("volumeOverlay").style.display = "none";
+        bgMusic.play(); 
+        startTypewriter(); 
+    }, 500);
+}
 
 /* 🌌 STARS BACKGROUND */
 const s=document.getElementById("stars"); const ctx=s.getContext("2d");
@@ -202,30 +226,28 @@ function type(elId, text, cb) {
     function t() { if (i < text.length) { el.innerHTML += text[i++]; setTimeout(t, 70); } else if (cb) cb(); } t();
 }
 
-window.onload = () => { 
+function startTypewriter() {
     type("title", "A girl was born 17 years ago!", () => { 
         type("subtitle", "Yes, it's YOU! A small gift from me", () => { 
-            document.getElementById("startBtn").style.display = "block"; 
+            document.getElementById("next1").style.display = "block"; 
         }); 
     }); 
-};
+}
 
-function startSurprise() { bgMusic.play(); next(2); }
-
-/* PAGE NAVIGATION */
-let autoSlideInterval;
+/* PAGE NAVIGATION & AUDIO/VIDEO SYNC */
 function next(n){
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.getElementById('p'+n).classList.add('active');
     
+    // Video Page Logic
     if(n == 4) {
-        if(!autoSlideInterval) autoSlideInterval = setInterval(nextSlide, 2000);
-    } else {
-        clearInterval(autoSlideInterval);
-        autoSlideInterval = null;
-    }
-
-    if(n==5){ 
+        bgMusic.pause(); // Pause background music
+        shreyaVideo.currentTime = 0;
+        shreyaVideo.play(); // Play the edit video
+    } else if (n == 5) {
+        shreyaVideo.pause(); // Pause video when moving to letter
+        bgMusic.play(); // Resume background music
+        
         type("letter", "Happy Birthday Shreya! You deserve all the happiness, love and smiles in the world today and always. You have this special way of making everything brighter around you. Anyways I couldn't celebrate your birthday like last time and I didn't want to.. But yeah I couldn't resist myself wishing you. I hope your days are filled with laughter, surprises, and moments that make you smile and happy.", () => { 
             document.getElementById("next5").style.display = "block"; 
         }); 
@@ -236,7 +258,7 @@ function decorate(){ document.getElementById("flagsDecor").style.top = "0"; setT
 function hideFlagsAndNext(n) { document.getElementById("flagsDecor").style.top = "-120px"; setTimeout(() => { next(n); }, 500); }
 function light(){ document.getElementById("flame").style.display="block"; document.getElementById("hbd").style.display="block"; document.getElementById("lightBtn").style.display="none"; document.getElementById("nextBtn").style.display="inline-block"; }
 
-/* BALLOONS LOGIC WITH POP EFFECT */
+/* BALLOONS LOGIC */
 let count=0;
 function pop(el,text){ 
     if(!el.classList.contains('popped')){ 
@@ -247,26 +269,7 @@ function pop(el,text){
     } 
 }
 
-/* PHOTO SLIDER LOGIC */
-let slideIdx=0;
-function nextSlide(){ 
-    let slides=document.querySelectorAll('.slide'); 
-    if(slides.length > 0) {
-        slides[slideIdx].classList.remove('active-img'); 
-        slideIdx=(slideIdx+1)%slides.length; 
-        slides[slideIdx].classList.add('active-img'); 
-    }
-}
-function prev(){ 
-    let slides=document.querySelectorAll('.slide'); 
-    if(slides.length > 0) {
-        slides[slideIdx].classList.remove('active-img'); 
-        slideIdx=(slideIdx-1+slides.length)%slides.length; 
-        slides[slideIdx].classList.add('active-img'); 
-    }
-}
-
-/* FIREWORKS & MUSIC RESTART */
+/* FIREWORKS LOGIC */
 function fireworks(){
     next(7); bgMusic.pause(); fireMusic.play();
     const canvas=document.getElementById("fwCanvas"); const c=canvas.getContext("2d");
@@ -288,8 +291,9 @@ function fireworks(){
 function showFinal(){ 
     next(8); 
     fireMusic.pause();
+    bgMusic.src = "music3.mp3"; 
     bgMusic.currentTime = 0;
-    bgMusic.play();
+    bgMusic.play(); 
     type("endMsg", "Sorry I couldn't do fireworks in reality but I could do that digitally. I hope this small surprise gave you a smile and it's a three days brain storming work, I hope you liked it.\n\n~From Yatin"); 
 }
 </script>
